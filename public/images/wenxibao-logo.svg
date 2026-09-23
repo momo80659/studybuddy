@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="210" viewBox="0 0 600 210" role="img" aria-labelledby="title desc">
+  <title id="title">温習寶</title>
+  <desc id="desc">温習寶香港警務筆試溫習中心標誌</desc>
+  <rect width="600" height="210" rx="30" fill="#F7F9FC"/>
+  <g transform="translate(22 24)">
+    <path d="M78 2 138 23v48c0 38-24 67-60 81C42 138 18 109 18 71V23L78 2Z" fill="#1A365D"/>
+    <path d="M78 15 126 32v39c0 30-18 54-48 68-30-14-48-38-48-68V32L78 15Z" fill="#E8F0F8"/>
+    <path d="M45 58c12-7 24-7 33 1v48c-9-8-21-8-33-1V58Zm66 0c-12-7-24-7-33 1v48c9-8 21-8 33-1V58Z" fill="#34A686"/>
+    <path d="M78 59v48" fill="none" stroke="#1A365D" stroke-width="5" stroke-linecap="round"/>
+    <path d="m78 26 5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1 5-11Z" fill="#E67E22"/>
+  </g>
+  <text x="188" y="94" fill="#1A365D" font-family="PingFang TC, Microsoft JhengHei, Noto Sans TC, sans-serif" font-size="68" font-weight="800" letter-spacing="3">温習寶</text>
+  <text x="192" y="139" fill="#526B85" font-family="PingFang TC, Microsoft JhengHei, Noto Sans TC, sans-serif" font-size="25" font-weight="600" letter-spacing="2">香港警務筆試溫習中心</text>
+  <rect x="192" y="157" width="348" height="4" rx="2" fill="#34A686" opacity="0.8"/>
+</svg>
