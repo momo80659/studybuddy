@@ -1,4 +1,6 @@
 // 溫習寶 PWA Service Worker
+// 快取 App 外殼，讓網站可安裝、可離線開啟
+
 const CACHE_NAME = 'wenxibao-v1';
 const CORE_ASSETS = [
   '/',
@@ -8,6 +10,7 @@ const CORE_ASSETS = [
   '/icons/icon-512x512.png'
 ];
 
+// 安裝時快取核心檔案
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -16,6 +19,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
+// 啟用新版本時清掉舊快取
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
@@ -26,6 +30,10 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// 攔截請求：
+// - API（/api/）一律走網路，不快取
+// - 頁面導覽：網路優先，離線時用快取的 index.html
+// - 其他同源 GET 靜態檔：快取優先
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   const url = new URL(request.url);
@@ -60,4 +68,3 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
-
