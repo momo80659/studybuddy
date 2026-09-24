@@ -86,6 +86,7 @@ function StudyCenterLogo({ className = "h-8 w-auto" }: { className?: string }) {
 function App() {
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [accountName, setAccountName] = useState("陳先生");
   const [screen, setScreen] = useState<Screen>("dashboard");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [practiceMode, setPracticeMode] = useState<PracticeMode>("select");
@@ -315,8 +316,10 @@ function App() {
   }
 
   if (!loggedIn) {
-    return <LoginScreen onLogin={() => setLoggedIn(true)} />;
+    return <LoginScreen onLogin={(name) => { setAccountName(name); setLoggedIn(true); }} />;
   }
+
+  const accountInitial = accountName.trim().charAt(0) || "陳";
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -336,8 +339,8 @@ function App() {
           <div className="flex items-center gap-2 sm:gap-3">
             <span className="status-pill"><span className="status-dot" />已登入</span>
             <div className="hidden items-center gap-2 border-l border-border pl-3 sm:flex">
-              <div className="avatar">陳</div>
-              <div className="hidden text-right md:block"><div className="text-xs font-semibold">陳先生</div><div className="text-[11px] text-muted-foreground">在職溫習者</div></div>
+              <div className="avatar">{accountInitial}</div>
+              <div className="hidden text-right md:block"><div className="text-xs font-semibold">{accountName}</div><div className="text-[11px] text-muted-foreground">在職溫習者</div></div>
             </div>
             <button className="icon-button" aria-label="開啟設定" onClick={() => showToast("設定功能即將推出")}><Settings className="h-5 w-5" /></button>
           </div>
@@ -407,7 +410,7 @@ function PrivacyPolicyScreen({ onAccept }: { onAccept: () => void }) {
   return <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/90 px-2 py-1 text-primary-foreground backdrop-blur-sm sm:px-4 sm:py-3"><div role="dialog" aria-modal="true" aria-labelledby="privacy-policy-title" className="flex h-[calc(100vh-0.5rem)] max-h-[calc(100vh-0.5rem)] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-card text-card-foreground shadow-2xl shadow-black/30 sm:h-[calc(100vh-1.5rem)] sm:max-h-[calc(100vh-1.5rem)]"><div className="relative shrink-0 border-b border-border p-4 sm:p-6"><div className="flex items-start gap-4 pr-32 sm:pr-40"><div className="brand-mark shrink-0"><ShieldCheck className="h-5 w-5" /></div><div className="min-w-0 flex-1"><div className="eyebrow text-[8px] leading-4 tracking-[0.12em] sm:text-[9px]">WELCOME · PRIVACY FIRST</div><h1 id="privacy-policy-title" className="mt-2 text-lg font-bold tracking-tight sm:text-xl">系統及私隱政策</h1></div></div><StudyCenterLogo className="absolute right-4 top-4 h-10 w-28 shrink-0 sm:right-6 sm:top-6" /><p className="mt-3 text-left text-sm leading-6 text-muted-foreground sm:ml-14">請先閱讀以下系統及私隱政策與使用條文，並確認你的同意聲明。</p></div><div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6"><section className="space-y-4 rounded-xl bg-muted p-5 text-sm leading-6"><h2 className="font-semibold">系統及私隱政策</h2><div><div className="font-semibold">資料用途</div><p className="mt-1 text-muted-foreground">本網站用於提供考試練習流程，所有作答紀錄均儲存於使用者瀏覽器本地端。</p></div><div><div className="font-semibold">個人資料</div><p className="mt-1 text-muted-foreground">註冊表單中的帳戶名稱、電郵號碼、介紹碼及密碼僅用於本頁面流程，不會傳送至遠端伺服器或保存於外部資料庫。</p></div><div><div className="font-semibold">介紹碼用途</div><p className="mt-1 text-muted-foreground">介紹碼用作進入資格驗證；未能提供有效介紹碼的使用者不能完成註冊或登入學習工作台。</p></div><div><div className="font-semibold">正式服務預留</div><p className="mt-1 text-muted-foreground">本平台以瀏覽器本地儲存方式運作，不涉及遠端帳戶伺服器。</p></div></section><TermsCard /><div className="mt-6 rounded-xl border border-primary/15 bg-primary/5 p-4 text-xs leading-5 text-muted-foreground"><div className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /><span>本政策及條文適用於本平台；如未來新增遠端服務，將另行提供更新的私隱政策及使用條款。</span></div></div></div><div className="shrink-0 border-t border-border bg-card p-5 sm:p-7"><label className="flex cursor-pointer items-start gap-3 text-xs leading-5 text-muted-foreground"><input type="checkbox" className="mt-1 h-4 w-4 shrink-0 accent-primary" checked={consentChecked} onChange={(event) => setConsentChecked(event.target.checked)} /><span>我已閱讀並明白上述系統及私隱政策與使用條文，同意進入登入／註冊流程。</span></label><button className="primary-button mt-4 w-full justify-center disabled:pointer-events-none disabled:opacity-50" disabled={!consentChecked} onClick={onAccept}>同意並進入登入中心 <ArrowRight className="h-4 w-4" /></button><div className="mt-3 text-center text-[9px] leading-4 text-muted-foreground">溫習寶 · 筆試溫習平台</div></div></div></div>;
 }
 
-function LoginScreen({ onLogin }: { onLogin: () => void }) {
+function LoginScreen({ onLogin }: { onLogin: (accountName: string) => void }) {
   const [mode, setMode] = useState<"login" | "register" | "forgot">("login");
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerAccount, setRegisterAccount] = useState("");
@@ -502,7 +505,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
         }
         setNoticeType("success");
         setNotice(result.message || message);
-        onLogin();
+        onLogin(result.user?.accountName || registerAccount.trim());
         return;
       } catch {
         setNoticeType("error");
@@ -542,7 +545,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
         }
         setNoticeType("success");
         setNotice(result.message || message);
-        onLogin();
+        onLogin(result.user?.accountName || loginAccount.trim());
         return;
       } catch {
         setNoticeType("error");
