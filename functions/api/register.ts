@@ -55,7 +55,7 @@ async function hashPassword(password: string): Promise<{ passwordHash: string; p
     {
       name: "PBKDF2",
       salt,
-      iterations: 210_000,
+      iterations: 100_000,
       hash: "SHA-256",
     },
     keyMaterial,
@@ -65,7 +65,7 @@ async function hashPassword(password: string): Promise<{ passwordHash: string; p
   return {
     passwordHash: toBase64(new Uint8Array(derivedBits)),
     passwordSalt: toBase64(salt),
-    passwordAlgo: "PBKDF2-SHA256-210000",
+    passwordAlgo: "PBKDF2-SHA256-100000",
   };
 }
 
