@@ -414,6 +414,8 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
   const [registerPassword, setRegisterPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [accessCode, setAccessCode] = useState("");
+  const [loginAccount, setLoginAccount] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
   const [notice, setNotice] = useState("");
   const [noticeType, setNoticeType] = useState<"error" | "success" | "info">("info");
   const [showPassword, setShowPassword] = useState(false);
@@ -509,9 +511,45 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
       }
     }
 
-    setNoticeType("success");
-    setNotice(message);
-    if (mode === "login") onLogin();
+    if (mode === "login") {
+      if (!loginAccount.trim()) {
+        setNoticeType("error");
+        setNotice("請輸入帳戶名稱");
+        return;
+      }
+      if (!loginPassword) {
+        setNoticeType("error");
+        setNotice("請輸入登入密碼");
+        return;
+      }
+      setNoticeType("info");
+      setNotice("正在登入，請稍候...");
+      try {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            accessCode: accessCode.trim(),
+            accountName: loginAccount.trim(),
+            password: loginPassword,
+          }),
+        });
+        const result = await response.json().catch(() => ({ message: "登入暫時未能完成，請稍後再試。" }));
+        if (!response.ok || !result.ok) {
+          setNoticeType("error");
+          setNotice(result.message || "登入暫時未能完成，請稍後再試。");
+          return;
+        }
+        setNoticeType("success");
+        setNotice(result.message || message);
+        onLogin();
+        return;
+      } catch {
+        setNoticeType("error");
+        setNotice("未能連接登入服務，請檢查網絡後再試。");
+        return;
+      }
+    }
   }
 
   return (
@@ -584,7 +622,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
             <>
               <div className="auth-field">
                 <label className="auth-label" htmlFor="login-account">賬戶名稱</label>
-                <input id="login-account" className="auth-input" placeholder="例如：HK-EXAM-001" />
+                <input id="login-account" className="auth-input" placeholder="例如：HK-EXAM-001" autoComplete="username" value={loginAccount} onChange={(e) => setLoginAccount(e.target.value)} />
               </div>
               <div className="auth-field">
                 <label className="auth-label" htmlFor="login-password">登入密碼</label>
@@ -594,6 +632,9 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                     type={showPassword ? "text" : "password"}
                     className="auth-input"
                     placeholder="輸入登入密碼"
+                    autoComplete="current-password"
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
                   />
                   <button type="button" className="auth-password-toggle" onClick={() => setShowPassword(!showPassword)}>
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
