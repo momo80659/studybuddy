@@ -371,43 +371,6 @@
   color: var(--auth-ink);
   box-shadow: 0 2px 8px rgba(44, 24, 16, 0.06);
 }
-/* Social buttons */
-.auth-social-row {
-  display: flex;
-  gap: 10px;
-}
-.auth-social-btn {
-  flex: 1;
-  min-height: 48px;
-  border: 1px solid var(--auth-line);
-  border-radius: 14px;
-  background: var(--auth-surface);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-.auth-social-btn:hover {
-  border-color: var(--auth-brand);
-  background: color-mix(in srgb, var(--auth-brand) 5%, var(--auth-surface));
-  transform: translateY(-1px);
-}
-.auth-social-btn-apple { background: #1a1a1a; border-color: #1a1a1a; }
-/* Divider */
-.auth-divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--auth-muted);
-  font-size: 12px;
-}
-.auth-divider::before,
-.auth-divider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--auth-line);
-}
 /* Form fields */
 .auth-field {
   display: flex;
@@ -607,6 +570,5 @@
 @media (max-width: 380px) {
   .auth-card { padding: 24px 20px; border-radius: 24px; }
   .auth-shell { max-width: 100%; }
-  .auth-social-btn { min-height: 44px; }
 }
 
