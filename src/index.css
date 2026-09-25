@@ -316,13 +316,13 @@
   border-radius: 18px;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, var(--auth-brand), var(--auth-brand-dark));
-  box-shadow: 0 8px 24px color-mix(in srgb, var(--auth-brand) 35%, transparent);
+  background: var(--auth-surface);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--auth-brand) 25%, transparent);
   overflow: hidden;
 }
 .auth-brand-mark img {
-  width: 40px;
-  height: 40px;
+  width: 56px;
+  height: 56px;
   object-fit: contain;
 }
 .auth-brand-name {
