@@ -187,6 +187,34 @@ function App() {
     return () => window.clearInterval(timer);
   }, [examMode, examSubmitted, finishExam]);
 
+  // 登入後從瀏覽器本地儲存還原學習進度
+  useEffect(() => {
+    if (!loggedIn || !accountName) return;
+    try {
+      const raw = window.localStorage.getItem(`wenxibao-progress:${accountName}`);
+      if (!raw) return;
+      const saved = JSON.parse(raw) as { answerRecords?: AnswerRecord[]; wrongIds?: string[]; favorites?: string[] };
+      if (Array.isArray(saved.answerRecords) && saved.answerRecords.length) setAnswerRecords(saved.answerRecords);
+      if (Array.isArray(saved.wrongIds) && saved.wrongIds.length) setWrongIds(saved.wrongIds);
+      if (Array.isArray(saved.favorites) && saved.favorites.length) setFavorites(saved.favorites);
+    } catch {
+      // 本地儲存資料無效時靜默忽略，重新開始
+    }
+  }, [loggedIn, accountName]);
+
+  // 學習進度變更時保存至瀏覽器本地儲存
+  useEffect(() => {
+    if (!loggedIn || !accountName) return;
+    try {
+      window.localStorage.setItem(
+        `wenxibao-progress:${accountName}`,
+        JSON.stringify({ answerRecords, wrongIds, favorites }),
+      );
+    } catch {
+      // 儲存空間不足或無法寫入時靜默失敗
+    }
+  }, [loggedIn, accountName, answerRecords, wrongIds, favorites]);
+
   function goTo(nextScreen: Screen) {
     setScreen(nextScreen);
     setMobileNavOpen(false);
@@ -409,7 +437,7 @@ function TermsCard() {
 function PrivacyPolicyScreen({ onAccept }: { onAccept: () => void }) {
   const [consentChecked, setConsentChecked] = useState(false);
 
-  return <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/90 px-2 py-1 text-primary-foreground backdrop-blur-sm sm:px-4 sm:py-3"><div role="dialog" aria-modal="true" aria-labelledby="privacy-policy-title" className="flex h-[calc(100vh-0.5rem)] max-h-[calc(100vh-0.5rem)] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-card text-card-foreground shadow-2xl shadow-black/30 sm:h-[calc(100vh-1.5rem)] sm:max-h-[calc(100vh-1.5rem)]"><div className="relative shrink-0 border-b border-border p-4 sm:p-6"><div className="flex items-start gap-4 pr-32 sm:pr-40"><div className="brand-mark shrink-0"><ShieldCheck className="h-5 w-5" /></div><div className="min-w-0 flex-1"><div className="eyebrow text-[8px] leading-4 tracking-[0.12em] sm:text-[9px]">WELCOME · PRIVACY FIRST</div><h1 id="privacy-policy-title" className="mt-2 text-lg font-bold tracking-tight sm:text-xl">系統及私隱政策</h1></div></div><StudyCenterLogo className="absolute right-4 top-4 h-12 w-12 shrink-0 sm:right-6 sm:top-6" /><p className="mt-3 text-left text-sm leading-6 text-muted-foreground sm:ml-14">請先閱讀以下系統及私隱政策與使用條文，並確認你的同意聲明。</p></div><div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6"><section className="space-y-4 rounded-xl bg-muted p-5 text-sm leading-6"><h2 className="font-semibold">系統及私隱政策</h2><div><div className="font-semibold">資料用途</div><p className="mt-1 text-muted-foreground">本網站用於提供考試練習流程，所有作答紀錄均儲存於使用者瀏覽器本地端。</p></div><div><div className="font-semibold">個人資料</div><p className="mt-1 text-muted-foreground">註冊表單中的帳戶名稱、電郵號碼、介紹碼及密碼僅用於本頁面流程，不會傳送至遠端伺服器或保存於外部資料庫。</p></div><div><div className="font-semibold">介紹碼用途</div><p className="mt-1 text-muted-foreground">介紹碼用作進入資格驗證；未能提供有效介紹碼的使用者不能完成註冊或登入學習工作台。</p></div><div><div className="font-semibold">正式服務預留</div><p className="mt-1 text-muted-foreground">本平台以瀏覽器本地儲存方式運作，不涉及遠端帳戶伺服器。</p></div></section><TermsCard /><div className="mt-6 rounded-xl border border-primary/15 bg-primary/5 p-4 text-xs leading-5 text-muted-foreground"><div className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /><span>本政策及條文適用於本平台；如未來新增遠端服務，將另行提供更新的私隱政策及使用條款。</span></div></div></div><div className="shrink-0 border-t border-border bg-card p-5 sm:p-7"><label className="flex cursor-pointer items-start gap-3 text-xs leading-5 text-muted-foreground"><input type="checkbox" className="mt-1 h-4 w-4 shrink-0 accent-primary" checked={consentChecked} onChange={(event) => setConsentChecked(event.target.checked)} /><span>我已閱讀並明白上述系統及私隱政策與使用條文，同意進入登入／註冊流程。</span></label><button className="primary-button mt-4 w-full justify-center disabled:pointer-events-none disabled:opacity-50" disabled={!consentChecked} onClick={onAccept}>同意並進入登入中心 <ArrowRight className="h-4 w-4" /></button><div className="mt-3 text-center text-[9px] leading-4 text-muted-foreground">溫習寶 · 筆試溫習平台</div></div></div></div>;
+  return <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/90 px-2 py-1 text-primary-foreground backdrop-blur-sm sm:px-4 sm:py-3"><div role="dialog" aria-modal="true" aria-labelledby="privacy-policy-title" className="flex h-[calc(100vh-0.5rem)] max-h-[calc(100vh-0.5rem)] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-card text-card-foreground shadow-2xl shadow-black/30 sm:h-[calc(100vh-1.5rem)] sm:max-h-[calc(100vh-1.5rem)]"><div className="relative shrink-0 border-b border-border p-4 sm:p-6"><div className="flex items-start gap-4 pr-32 sm:pr-40"><div className="brand-mark shrink-0"><ShieldCheck className="h-5 w-5" /></div><div className="min-w-0 flex-1"><div className="eyebrow text-[8px] leading-4 tracking-[0.12em] sm:text-[9px]">WELCOME · PRIVACY FIRST</div><h1 id="privacy-policy-title" className="mt-2 text-lg font-bold tracking-tight sm:text-xl">系統及私隱政策</h1></div></div><StudyCenterLogo className="absolute right-4 top-4 h-12 w-12 shrink-0 sm:right-6 sm:top-6" /><p className="mt-3 text-left text-sm leading-6 text-muted-foreground sm:ml-14">請先閱讀以下系統及私隱政策與使用條文，並確認你的同意聲明。</p></div><div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6"><section className="space-y-4 rounded-xl bg-muted p-5 text-sm leading-6"><h2 className="font-semibold">系統及私隱政策</h2><div><div className="font-semibold">資料用途</div><p className="mt-1 text-muted-foreground">本網站用於提供考試練習流程，所有作答紀錄均儲存於使用者瀏覽器本地端。</p></div><div><div className="font-semibold">個人資料</div><p className="mt-1 text-muted-foreground">註冊表單中的帳戶名稱與電郵將加密傳送至本平台的 Cloudflare 資料庫以建立帳戶；密碼不會以明文儲存，而是以 PBKDF2 單向雜湊技術處理後保存。介紹碼僅用於資格驗證，不會另作儲存。</p></div><div><div className="font-semibold">介紹碼用途</div><p className="mt-1 text-muted-foreground">介紹碼用作進入資格驗證；未能提供有效介紹碼的使用者不能完成註冊或登入學習工作台。</p></div><div><div className="font-semibold">帳戶資料儲存</div><p className="mt-1 text-muted-foreground">帳戶資料儲存於本平台的 Cloudflare D1 資料庫；作答紀錄、錯題本及收藏則儲存於使用者瀏覽器本地端。你可隨時在「設定」頁面永久刪除帳戶資料。</p></div></section><TermsCard /><div className="mt-6 rounded-xl border border-primary/15 bg-primary/5 p-4 text-xs leading-5 text-muted-foreground"><div className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /><span>本政策及條文適用於本平台；如未來新增遠端服務，將另行提供更新的私隱政策及使用條款。</span></div></div></div><div className="shrink-0 border-t border-border bg-card p-5 sm:p-7"><label className="flex cursor-pointer items-start gap-3 text-xs leading-5 text-muted-foreground"><input type="checkbox" className="mt-1 h-4 w-4 shrink-0 accent-primary" checked={consentChecked} onChange={(event) => setConsentChecked(event.target.checked)} /><span>我已閱讀並明白上述系統及私隱政策與使用條文，同意進入登入／註冊流程。</span></label><button className="primary-button mt-4 w-full justify-center disabled:pointer-events-none disabled:opacity-50" disabled={!consentChecked} onClick={onAccept}>同意並進入登入中心 <ArrowRight className="h-4 w-4" /></button><div className="mt-3 text-center text-[9px] leading-4 text-muted-foreground">溫習寶 · 筆試溫習平台</div></div></div></div>;
 }
 
 function LoginScreen({ onLogin }: { onLogin: (accountName: string) => void }) {
@@ -426,12 +454,19 @@ function LoginScreen({ onLogin }: { onLogin: (accountName: string) => void }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [toast, setToast] = useState("");
+  const [legalView, setLegalView] = useState<"terms" | "privacy" | null>(null);
 
-  function showToast(msg: string) {
-    setToast(msg);
-    window.setTimeout(() => setToast(""), 2500);
-  }
+  useEffect(() => {
+    try {
+      const savedAccount = window.localStorage.getItem("wenxibao-remember-account");
+      if (savedAccount) {
+        setLoginAccount(savedAccount);
+        setRememberMe(true);
+      }
+    } catch {
+      // 無法讀取本地儲存時靜默忽略
+    }
+  }, []);
 
   async function submitDemo(message: string) {
     if (accessCode.trim() !== "01347") {
@@ -507,6 +542,10 @@ function LoginScreen({ onLogin }: { onLogin: (accountName: string) => void }) {
         }
         setNoticeType("success");
         setNotice(result.message || message);
+        try {
+          if (rememberMe) window.localStorage.setItem("wenxibao-remember-account", (result.user?.accountName || registerAccount).trim());
+          else window.localStorage.removeItem("wenxibao-remember-account");
+        } catch { /* 忽略本地儲存失敗 */ }
         onLogin(result.user?.accountName || registerAccount.trim());
         return;
       } catch {
@@ -547,6 +586,10 @@ function LoginScreen({ onLogin }: { onLogin: (accountName: string) => void }) {
         }
         setNoticeType("success");
         setNotice(result.message || message);
+        try {
+          if (rememberMe) window.localStorage.setItem("wenxibao-remember-account", (result.user?.accountName || loginAccount).trim());
+          else window.localStorage.removeItem("wenxibao-remember-account");
+        } catch { /* 忽略本地儲存失敗 */ }
         onLogin(result.user?.accountName || loginAccount.trim());
         return;
       } catch {
@@ -682,13 +725,13 @@ function LoginScreen({ onLogin }: { onLogin: (accountName: string) => void }) {
           {/* Forgot mode */}
           {mode === "forgot" && (
             <>
-              <div className="auth-field">
-                <label className="auth-label" htmlFor="forgot-email">註冊電郵</label>
-                <input id="forgot-email" type="email" className="auth-input" placeholder="name@example.com" />
+              <div className="auth-notice auth-notice-info">
+                <CircleHelp className="h-4 w-4 shrink-0 mt-0.5" />
+                <span>本平台暫未提供自動尋回密碼功能。如忘記密碼，請電郵 feedback@example.com，並提供你的帳戶名稱及註冊電郵，管理員核實身份後會為你重設密碼。</span>
               </div>
-              <button className="auth-btn-primary" onClick={() => { setNoticeType("success"); setNotice("尋回連結已發送至註冊電郵"); }}>
-                發送尋回密碼電郵 <ArrowRight className="h-4 w-4" />
-              </button>
+              <a className="auth-btn-primary" href="mailto:feedback@example.com?subject=%E5%B0%8B%E5%9B%9E%E5%B8%B3%E6%88%B6%E5%AF%86%E7%A2%BC">
+                電郵管理員重設密碼 <ArrowRight className="h-4 w-4" />
+              </a>
               <button className="auth-btn-text" onClick={() => { setMode("login"); setNotice(""); }}>
                 <ArrowLeft className="h-4 w-4" /> 返回登入
               </button>
@@ -708,14 +751,35 @@ function LoginScreen({ onLogin }: { onLogin: (accountName: string) => void }) {
         <div className="auth-footer">
           溫習寶 · 筆試溫習平台
           <div className="auth-footer-links">
-            <button onClick={() => showToast("使用條款")}>使用條款</button>
-            <button onClick={() => showToast("私隱政策")}>私隱政策</button>
+            <button onClick={() => setLegalView("terms")}>使用條款</button>
+            <button onClick={() => setLegalView("privacy")}>私隱政策</button>
           </div>
         </div>
       </div>
 
-      {/* Toast */}
-      {toast && <div className="auth-toast">{toast}</div>}
+      {/* Terms / Privacy modal */}
+      {legalView && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-6" onClick={() => setLegalView(null)}>
+          <div role="dialog" aria-modal="true" className="flex max-h-full w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-card text-card-foreground shadow-2xl" onClick={(event) => event.stopPropagation()}>
+            <div className="flex shrink-0 items-center justify-between border-b border-border p-4">
+              <h2 className="text-base font-bold">{legalView === "terms" ? "使用條文" : "系統及私隱政策"}</h2>
+              <button className="secondary-button" onClick={() => setLegalView(null)}>關閉</button>
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto p-4 text-sm leading-7 text-muted-foreground">
+              {legalView === "terms" ? (
+                <div className="whitespace-pre-wrap">{APP_TERMS}</div>
+              ) : (
+                <div className="space-y-4">
+                  <div><div className="font-semibold text-foreground">資料用途</div><p className="mt-1">本網站用於提供考試練習流程，所有作答紀錄均儲存於使用者瀏覽器本地端。</p></div>
+                  <div><div className="font-semibold text-foreground">個人資料</div><p className="mt-1">註冊表單中的帳戶名稱與電郵將加密傳送至本平台的 Cloudflare 資料庫以建立帳戶；密碼不會以明文儲存，而是以 PBKDF2 單向雜湊技術處理後保存。介紹碼僅用於資格驗證，不會另作儲存。</p></div>
+                  <div><div className="font-semibold text-foreground">介紹碼用途</div><p className="mt-1">介紹碼用作進入資格驗證；未能提供有效介紹碼的使用者不能完成註冊或登入學習工作台。</p></div>
+                  <div><div className="font-semibold text-foreground">帳戶資料儲存</div><p className="mt-1">帳戶資料儲存於本平台的 Cloudflare D1 資料庫；作答紀錄、錯題本及收藏則儲存於使用者瀏覽器本地端。你可隨時在「設定」頁面永久刪除帳戶資料。</p></div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -990,6 +1054,10 @@ function SettingsView({ accountName, onLogout, onToast }: { accountName: string;
         setDeleteError(result.message || "刪除帳號暫時未能完成，請稍後再試。");
         return;
       }
+      try {
+        window.localStorage.removeItem(`wenxibao-progress:${accountName.trim()}`);
+        window.localStorage.removeItem("wenxibao-remember-account");
+      } catch { /* 忽略本地儲存失敗 */ }
       if ("caches" in window) {
         const keys = await caches.keys();
         await Promise.all(keys.map((key) => caches.delete(key)));
