@@ -67,6 +67,7 @@ const navItems = [
   { id: "disclaimer", label: "免責聲明", icon: ShieldCheck },
   { id: "feedback", label: "意見收集", icon: CircleHelp },
   { id: "share", label: "分享好友", icon: ExternalLink },
+  { id: "settings", label: "設定", icon: Settings },
 ] as const;
 
 type Screen = (typeof navItems)[number]["id"];
@@ -79,8 +80,8 @@ function cn(...classes: Array<string | false | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
 
-function StudyCenterLogo({ className = "h-8 w-auto" }: { className?: string }) {
-  return <img src="/images/wenxibao-logo.svg" alt="温習寶 Logo" className={cn("object-contain", className)} />;
+function StudyCenterLogo({ className = "h-8 w-8" }: { className?: string }) {
+  return <img src="/images/wenxibao-logo.png" alt="温習寶 Logo" className={cn("rounded-lg object-contain", className)} />;
 }
 
 function App() {
@@ -334,7 +335,7 @@ function App() {
               <div className="text-sm font-bold tracking-tight text-primary">筆試溫習中心</div>
               <div className="hidden text-[11px] text-muted-foreground sm:block">跨裝置互動式溫習平台</div>
             </div>
-            <StudyCenterLogo className="h-9 w-28 sm:h-10 sm:w-32" />
+            <StudyCenterLogo className="h-9 w-9 sm:h-10 sm:w-10" />
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
             <span className="status-pill"><span className="status-dot" />已登入</span>
@@ -342,7 +343,7 @@ function App() {
               <div className="avatar">{accountInitial}</div>
               <div className="hidden text-right md:block"><div className="text-xs font-semibold">{accountName}</div><div className="text-[11px] text-muted-foreground">在職溫習者</div></div>
             </div>
-            <button className="icon-button" aria-label="開啟設定" onClick={() => showToast("設定功能即將推出")}><Settings className="h-5 w-5" /></button>
+            <button className="icon-button" aria-label="開啟設定" onClick={() => goTo("settings")}><Settings className="h-5 w-5" /></button>
           </div>
         </div>
       </header>
@@ -376,6 +377,7 @@ function App() {
             {screen === "disclaimer" && <DisclaimerView />}
             {screen === "feedback" && <FeedbackView />}
             {screen === "share" && <ShareView onToast={showToast} />}
+            {screen === "settings" && <SettingsView accountName={accountName} onLogout={() => setLoggedIn(false)} onToast={showToast} />}
           </div>
         </main>
       </div>
@@ -407,7 +409,7 @@ function TermsCard() {
 function PrivacyPolicyScreen({ onAccept }: { onAccept: () => void }) {
   const [consentChecked, setConsentChecked] = useState(false);
 
-  return <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/90 px-2 py-1 text-primary-foreground backdrop-blur-sm sm:px-4 sm:py-3"><div role="dialog" aria-modal="true" aria-labelledby="privacy-policy-title" className="flex h-[calc(100vh-0.5rem)] max-h-[calc(100vh-0.5rem)] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-card text-card-foreground shadow-2xl shadow-black/30 sm:h-[calc(100vh-1.5rem)] sm:max-h-[calc(100vh-1.5rem)]"><div className="relative shrink-0 border-b border-border p-4 sm:p-6"><div className="flex items-start gap-4 pr-32 sm:pr-40"><div className="brand-mark shrink-0"><ShieldCheck className="h-5 w-5" /></div><div className="min-w-0 flex-1"><div className="eyebrow text-[8px] leading-4 tracking-[0.12em] sm:text-[9px]">WELCOME · PRIVACY FIRST</div><h1 id="privacy-policy-title" className="mt-2 text-lg font-bold tracking-tight sm:text-xl">系統及私隱政策</h1></div></div><StudyCenterLogo className="absolute right-4 top-4 h-10 w-28 shrink-0 sm:right-6 sm:top-6" /><p className="mt-3 text-left text-sm leading-6 text-muted-foreground sm:ml-14">請先閱讀以下系統及私隱政策與使用條文，並確認你的同意聲明。</p></div><div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6"><section className="space-y-4 rounded-xl bg-muted p-5 text-sm leading-6"><h2 className="font-semibold">系統及私隱政策</h2><div><div className="font-semibold">資料用途</div><p className="mt-1 text-muted-foreground">本網站用於提供考試練習流程，所有作答紀錄均儲存於使用者瀏覽器本地端。</p></div><div><div className="font-semibold">個人資料</div><p className="mt-1 text-muted-foreground">註冊表單中的帳戶名稱、電郵號碼、介紹碼及密碼僅用於本頁面流程，不會傳送至遠端伺服器或保存於外部資料庫。</p></div><div><div className="font-semibold">介紹碼用途</div><p className="mt-1 text-muted-foreground">介紹碼用作進入資格驗證；未能提供有效介紹碼的使用者不能完成註冊或登入學習工作台。</p></div><div><div className="font-semibold">正式服務預留</div><p className="mt-1 text-muted-foreground">本平台以瀏覽器本地儲存方式運作，不涉及遠端帳戶伺服器。</p></div></section><TermsCard /><div className="mt-6 rounded-xl border border-primary/15 bg-primary/5 p-4 text-xs leading-5 text-muted-foreground"><div className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /><span>本政策及條文適用於本平台；如未來新增遠端服務，將另行提供更新的私隱政策及使用條款。</span></div></div></div><div className="shrink-0 border-t border-border bg-card p-5 sm:p-7"><label className="flex cursor-pointer items-start gap-3 text-xs leading-5 text-muted-foreground"><input type="checkbox" className="mt-1 h-4 w-4 shrink-0 accent-primary" checked={consentChecked} onChange={(event) => setConsentChecked(event.target.checked)} /><span>我已閱讀並明白上述系統及私隱政策與使用條文，同意進入登入／註冊流程。</span></label><button className="primary-button mt-4 w-full justify-center disabled:pointer-events-none disabled:opacity-50" disabled={!consentChecked} onClick={onAccept}>同意並進入登入中心 <ArrowRight className="h-4 w-4" /></button><div className="mt-3 text-center text-[9px] leading-4 text-muted-foreground">溫習寶 · 筆試溫習平台</div></div></div></div>;
+  return <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/90 px-2 py-1 text-primary-foreground backdrop-blur-sm sm:px-4 sm:py-3"><div role="dialog" aria-modal="true" aria-labelledby="privacy-policy-title" className="flex h-[calc(100vh-0.5rem)] max-h-[calc(100vh-0.5rem)] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-card text-card-foreground shadow-2xl shadow-black/30 sm:h-[calc(100vh-1.5rem)] sm:max-h-[calc(100vh-1.5rem)]"><div className="relative shrink-0 border-b border-border p-4 sm:p-6"><div className="flex items-start gap-4 pr-32 sm:pr-40"><div className="brand-mark shrink-0"><ShieldCheck className="h-5 w-5" /></div><div className="min-w-0 flex-1"><div className="eyebrow text-[8px] leading-4 tracking-[0.12em] sm:text-[9px]">WELCOME · PRIVACY FIRST</div><h1 id="privacy-policy-title" className="mt-2 text-lg font-bold tracking-tight sm:text-xl">系統及私隱政策</h1></div></div><StudyCenterLogo className="absolute right-4 top-4 h-12 w-12 shrink-0 sm:right-6 sm:top-6" /><p className="mt-3 text-left text-sm leading-6 text-muted-foreground sm:ml-14">請先閱讀以下系統及私隱政策與使用條文，並確認你的同意聲明。</p></div><div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6"><section className="space-y-4 rounded-xl bg-muted p-5 text-sm leading-6"><h2 className="font-semibold">系統及私隱政策</h2><div><div className="font-semibold">資料用途</div><p className="mt-1 text-muted-foreground">本網站用於提供考試練習流程，所有作答紀錄均儲存於使用者瀏覽器本地端。</p></div><div><div className="font-semibold">個人資料</div><p className="mt-1 text-muted-foreground">註冊表單中的帳戶名稱、電郵號碼、介紹碼及密碼僅用於本頁面流程，不會傳送至遠端伺服器或保存於外部資料庫。</p></div><div><div className="font-semibold">介紹碼用途</div><p className="mt-1 text-muted-foreground">介紹碼用作進入資格驗證；未能提供有效介紹碼的使用者不能完成註冊或登入學習工作台。</p></div><div><div className="font-semibold">正式服務預留</div><p className="mt-1 text-muted-foreground">本平台以瀏覽器本地儲存方式運作，不涉及遠端帳戶伺服器。</p></div></section><TermsCard /><div className="mt-6 rounded-xl border border-primary/15 bg-primary/5 p-4 text-xs leading-5 text-muted-foreground"><div className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /><span>本政策及條文適用於本平台；如未來新增遠端服務，將另行提供更新的私隱政策及使用條款。</span></div></div></div><div className="shrink-0 border-t border-border bg-card p-5 sm:p-7"><label className="flex cursor-pointer items-start gap-3 text-xs leading-5 text-muted-foreground"><input type="checkbox" className="mt-1 h-4 w-4 shrink-0 accent-primary" checked={consentChecked} onChange={(event) => setConsentChecked(event.target.checked)} /><span>我已閱讀並明白上述系統及私隱政策與使用條文，同意進入登入／註冊流程。</span></label><button className="primary-button mt-4 w-full justify-center disabled:pointer-events-none disabled:opacity-50" disabled={!consentChecked} onClick={onAccept}>同意並進入登入中心 <ArrowRight className="h-4 w-4" /></button><div className="mt-3 text-center text-[9px] leading-4 text-muted-foreground">溫習寶 · 筆試溫習平台</div></div></div></div>;
 }
 
 function LoginScreen({ onLogin }: { onLogin: (accountName: string) => void }) {
@@ -561,7 +563,7 @@ function LoginScreen({ onLogin }: { onLogin: (accountName: string) => void }) {
         {/* Brand header */}
         <div className="auth-brand-header">
           <div className="auth-brand-mark">
-            <img src="/images/wenxibao-logo.svg" alt="温習寶" />
+            <img src="/images/wenxibao-logo.png" alt="温習寶" />
           </div>
           <div className="auth-brand-name">温習寶</div>
           <div className="auth-brand-tag">筆試溫習中心</div>
@@ -953,6 +955,103 @@ function FeedbackView() {
   const subject = encodeURIComponent("筆試溫習中心意見回饋");
   const body = encodeURIComponent(`學員電郵：${email}\n\n意見內容：\n${message}`);
   return <div className="mx-auto max-w-3xl space-y-7"><PageIntro eyebrow="STUDY WORKPLACE" title="意見收集" description="歡迎分享使用體驗、題庫建議或介面改善方向。" action={<span className="status-pill">意見收集</span>} /><div className="notice-banner"><div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground"><CircleHelp className="h-5 w-5" /></div><div><div className="text-sm font-semibold">意見收集說明</div><p className="mt-1 text-xs leading-5 text-muted-foreground">按下電郵按鈕會開啟你的電郵程式，以地址 feedback@example.com 建立草稿。</p></div></div><form className="panel space-y-5" onSubmit={(event) => event.preventDefault()}><div><label className="field-label" htmlFor="feedback-email">學員電郵</label><input id="feedback-email" type="email" required className="input-demo mt-2 w-full" placeholder="name@example.com" value={email} onChange={(event) => setEmail(event.target.value)} /></div><div><label className="field-label" htmlFor="feedback-message">意見內容</label><textarea id="feedback-message" required className="input-demo mt-2 min-h-40 w-full resize-y" placeholder="請輸入你的意見或建議" value={message} onChange={(event) => setMessage(event.target.value)} /></div><a className={cn("primary-button inline-flex justify-center", (!email || !message) && "pointer-events-none opacity-50")} href={`mailto:feedback@example.com?subject=${subject}&body=${body}`}>以電郵反映意見 <ArrowRight className="h-4 w-4" /></a><p className="text-xs text-muted-foreground">收件地址：feedback@example.com · 表單內容不會由本平台保存。</p></form></div>;
+}
+
+
+function SettingsView({ accountName, onLogout, onToast }: { accountName: string; onLogout: () => void; onToast: (message: string) => void }) {
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteMessage, setDeleteMessage] = useState("");
+  const [deleteError, setDeleteError] = useState("");
+
+  async function clearOfflineCache() {
+    try {
+      if ("caches" in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((key) => caches.delete(key)));
+      }
+      if ("serviceWorker" in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registrations.map((registration) => registration.unregister()));
+      }
+      onToast("離線快取已清除，重新載入後會重新建立。");
+    } catch {
+      onToast("清除快取暫時未能完成，請稍後再試。");
+    }
+  }
+
+  async function deleteAccount() {
+    if (!deletePassword) {
+      setDeleteError("請輸入登入密碼以確認刪除。");
+      return;
+    }
+    if (!deleteConfirm) {
+      setDeleteError("請先勾選確認方格。");
+      return;
+    }
+    setDeleting(true);
+    setDeleteError("");
+    setDeleteMessage("正在刪除帳號，請稍候...");
+    try {
+      const response = await fetch("/api/delete-account", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ accountName: accountName.trim(), password: deletePassword }),
+      });
+      const result = await response.json().catch(() => ({ message: "刪除帳號暫時未能完成，請稍後再試。" }));
+      if (!response.ok || !result.ok) {
+        setDeleting(false);
+        setDeleteMessage("");
+        setDeleteError(result.message || "刪除帳號暫時未能完成，請稍後再試。");
+        return;
+      }
+      if ("caches" in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((key) => caches.delete(key)));
+      }
+      onLogout();
+    } catch {
+      setDeleting(false);
+      setDeleteMessage("");
+      setDeleteError("未能連接刪除服務，請檢查網絡後再試。");
+    }
+  }
+
+  return <div className="mx-auto max-w-3xl space-y-7">
+    <PageIntro eyebrow="ACCOUNT SETTINGS" title="設定" description="管理帳戶、離線資料及應用程式資訊。" action={<span className="status-pill">帳戶設定</span>} />
+    <div className="notice-banner"><div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground"><Settings className="h-5 w-5" /></div><div><div className="text-sm font-semibold">設定說明</div><p className="mt-1 text-xs leading-5 text-muted-foreground">此頁管理目前登入帳戶及本機離線資料。刪除帳號前請先完成重要溫習紀錄備份。</p></div></div>
+    <section className="panel space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="avatar">{accountName.trim().charAt(0) || "溫"}</div>
+        <div><div className="text-sm font-semibold">{accountName}</div><div className="text-[11px] text-muted-foreground">在職溫習者 · 已登入</div></div>
+      </div>
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <button className="secondary-button justify-center" onClick={clearOfflineCache}><RotateCcw className="h-4 w-4" />清除離線快取</button>
+        <button className="secondary-button justify-center" onClick={onLogout}><X className="h-4 w-4" />登出帳戶</button>
+      </div>
+      <p className="text-xs text-muted-foreground">清除離線快取會移除手機／電腦上暫存的頁面資源，下次開啟時會自動重新下載；登出後需重新輸入帳戶名稱及密碼登入。</p>
+    </section>
+    <section className="panel space-y-4">
+      <div className="flex items-center gap-2 text-sm font-semibold"><ShieldCheck className="h-4 w-4 text-primary" />刪除帳號</div>
+      <p className="text-xs leading-5 text-muted-foreground">刪除帳號會永久移除伺服器上的帳戶名稱、電郵及密碼資料，無法復原。瀏覽器內的作答紀錄不會因此刪除。</p>
+      <div>
+        <label className="field-label" htmlFor="delete-password">登入密碼（確認身份）</label>
+        <input id="delete-password" type="password" className="input-demo mt-2 w-full" placeholder="請輸入目前帳戶的登入密碼" value={deletePassword} onChange={(event) => setDeletePassword(event.target.value)} disabled={deleting} />
+      </div>
+      <label className="flex cursor-pointer items-start gap-3 text-xs leading-5 text-muted-foreground">
+        <input type="checkbox" className="mt-1 h-4 w-4 shrink-0 accent-primary" checked={deleteConfirm} onChange={(event) => setDeleteConfirm(event.target.checked)} disabled={deleting} />
+        <span>我明白刪除帳號後帳戶資料無法復原，並確認要永久刪除此帳號。</span>
+      </label>
+      {deleteMessage && <p className="text-xs text-primary">{deleteMessage}</p>}
+      {deleteError && <p className="text-xs" style={{ color: "var(--destructive)" }}>{deleteError}</p>}
+      <button className="secondary-button justify-center" style={{ borderColor: "var(--destructive)", color: "var(--destructive)" }} disabled={deleting || !deletePassword || !deleteConfirm} onClick={deleteAccount}><XCircle className="h-4 w-4" />永久刪除帳號</button>
+    </section>
+    <section className="panel space-y-2">
+      <div className="text-sm font-semibold">關於</div>
+      <div className="text-xs leading-5 text-muted-foreground">溫習寶 · 筆試溫習中心（PWA 版本）<br />作答紀錄儲存於瀏覽器本地端；帳戶資料經加密密碼驗證後儲存於平台資料庫。</div>
+    </section>
+  </div>;
 }
 
 
