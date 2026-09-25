@@ -727,9 +727,9 @@ function LoginScreen({ onLogin }: { onLogin: (accountName: string) => void }) {
             <>
               <div className="auth-notice auth-notice-info">
                 <CircleHelp className="h-4 w-4 shrink-0 mt-0.5" />
-                <span>本平台暫未提供自動尋回密碼功能。如忘記密碼，請電郵 feedback@example.com，並提供你的帳戶名稱及註冊電郵，管理員核實身份後會為你重設密碼。</span>
+                <span>本平台暫未提供自動尋回密碼功能。如忘記密碼，請電郵 studybuddytool@hotmail.com，並提供你的帳戶名稱及註冊電郵，管理員核實身份後會為你重設密碼。</span>
               </div>
-              <a className="auth-btn-primary" href="mailto:feedback@example.com?subject=%E5%B0%8B%E5%9B%9E%E5%B8%B3%E6%88%B6%E5%AF%86%E7%A2%BC">
+              <a className="auth-btn-primary" href="mailto:studybuddytool@hotmail.com?subject=%E5%B0%8B%E5%9B%9E%E5%B8%B3%E6%88%B6%E5%AF%86%E7%A2%BC">
                 電郵管理員重設密碼 <ArrowRight className="h-4 w-4" />
               </a>
               <button className="auth-btn-text" onClick={() => { setMode("login"); setNotice(""); }}>
@@ -893,7 +893,7 @@ function ProgressView({ chapterStats, totalAnswered, totalCorrect, overallAccura
 
 function ShareView({ onToast }: { onToast: (message: string) => void }) {
   const [shareUrl, setShareUrl] = useState("");
-  const shareText = "我正在使用筆試溫習中心，一起開始筆試練習吧！";
+  const shareText = "我正在使用「溫習寶」筆試溫習中心，一起開始筆試練習吧！";
 
   useEffect(() => {
     setShareUrl(window.location.href);
@@ -926,7 +926,7 @@ function ShareView({ onToast }: { onToast: (message: string) => void }) {
     if (!shareUrl) return;
     if (navigator.share) {
       try {
-        await navigator.share({ title: "筆試溫習中心", text: shareText, url: shareUrl });
+        await navigator.share({ title: "溫習寶｜筆試溫習中心", text: shareText, url: shareUrl });
         onToast("已開啟手機分享面板");
         return;
       } catch (error) {
@@ -937,7 +937,7 @@ function ShareView({ onToast }: { onToast: (message: string) => void }) {
   }
 
   const whatsappUrl = shareUrl
-    ? `https://wa.me/?text=${encodeURIComponent(`${shareText}\\n${shareUrl}`)}`
+    ? `https://wa.me/?text=${encodeURIComponent(`${shareText}\n${shareUrl}`)}`
     : "#";
 
   return <div className="mx-auto max-w-4xl space-y-7">
@@ -1000,9 +1000,9 @@ function DisclaimerView() {
 function FeedbackView() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
-  const subject = encodeURIComponent("筆試溫習中心意見回饋");
+  const subject = encodeURIComponent("溫習寶意見回饋");
   const body = encodeURIComponent(`學員電郵：${email}\n\n意見內容：\n${message}`);
-  return <div className="mx-auto max-w-3xl space-y-7"><PageIntro eyebrow="STUDY WORKPLACE" title="意見收集" description="歡迎分享使用體驗、題庫建議或介面改善方向。" action={<span className="status-pill">意見收集</span>} /><div className="notice-banner"><div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground"><CircleHelp className="h-5 w-5" /></div><div><div className="text-sm font-semibold">意見收集說明</div><p className="mt-1 text-xs leading-5 text-muted-foreground">按下電郵按鈕會開啟你的電郵程式，以地址 feedback@example.com 建立草稿。</p></div></div><form className="panel space-y-5" onSubmit={(event) => event.preventDefault()}><div><label className="field-label" htmlFor="feedback-email">學員電郵</label><input id="feedback-email" type="email" required className="input-demo mt-2 w-full" placeholder="name@example.com" value={email} onChange={(event) => setEmail(event.target.value)} /></div><div><label className="field-label" htmlFor="feedback-message">意見內容</label><textarea id="feedback-message" required className="input-demo mt-2 min-h-40 w-full resize-y" placeholder="請輸入你的意見或建議" value={message} onChange={(event) => setMessage(event.target.value)} /></div><a className={cn("primary-button inline-flex justify-center", (!email || !message) && "pointer-events-none opacity-50")} href={`mailto:feedback@example.com?subject=${subject}&body=${body}`}>以電郵反映意見 <ArrowRight className="h-4 w-4" /></a><p className="text-xs text-muted-foreground">收件地址：feedback@example.com · 表單內容不會由本平台保存。</p></form></div>;
+  return <div className="mx-auto max-w-3xl space-y-7"><PageIntro eyebrow="STUDY WORKPLACE" title="意見收集" description="歡迎分享使用體驗、題庫建議或介面改善方向。" action={<span className="status-pill">意見收集</span>} /><div className="notice-banner"><div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground"><CircleHelp className="h-5 w-5" /></div><div><div className="text-sm font-semibold">意見收集說明</div><p className="mt-1 text-xs leading-5 text-muted-foreground">按下電郵按鈕會開啟你的電郵程式，以地址 studybuddytool@hotmail.com 建立草稿。</p></div></div><form className="panel space-y-5" onSubmit={(event) => event.preventDefault()}><div><label className="field-label" htmlFor="feedback-email">學員電郵</label><input id="feedback-email" type="email" required className="input-demo mt-2 w-full" placeholder="name@example.com" value={email} onChange={(event) => setEmail(event.target.value)} /></div><div><label className="field-label" htmlFor="feedback-message">意見內容</label><textarea id="feedback-message" required className="input-demo mt-2 min-h-40 w-full resize-y" placeholder="請輸入你的意見或建議" value={message} onChange={(event) => setMessage(event.target.value)} /></div><a className={cn("primary-button inline-flex justify-center", (!email || !message) && "pointer-events-none opacity-50")} href={`mailto:studybuddytool@hotmail.com?subject=${subject}&body=${body}`}>以電郵反映意見 <ArrowRight className="h-4 w-4" /></a><p className="text-xs text-muted-foreground">收件地址：studybuddytool@hotmail.com · 表單內容不會由本平台保存。</p></form></div>;
 }
 
 
