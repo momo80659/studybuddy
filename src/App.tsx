@@ -441,7 +441,14 @@ function PrivacyPolicyScreen({ onAccept }: { onAccept: () => void }) {
 }
 
 function LoginScreen({ onLogin }: { onLogin: (accountName: string) => void }) {
-  const [mode, setMode] = useState<"login" | "register" | "forgot">("login");
+  const [mode, setMode] = useState<"login" | "register" | "forgot" | "reset">("login");
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotSubmitting, setForgotSubmitting] = useState(false);
+  const [resetToken, setResetToken] = useState("");
+  const [resetPassword, setResetPassword] = useState("");
+  const [resetConfirmPassword, setResetConfirmPassword] = useState("");
+  const [resetSubmitting, setResetSubmitting] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerAccount, setRegisterAccount] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
@@ -466,7 +473,125 @@ function LoginScreen({ onLogin }: { onLogin: (accountName: string) => void }) {
     } catch {
       // 無法讀取本地儲存時靜默忽略
     }
+    // 從電郵重設連結進入：/?token=xxx#reset
+    try {
+      const hash = window.location.hash || "";
+      if (hash.includes("reset")) {
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get("token") || "";
+        if (token) {
+          setResetToken(token);
+          setMode("reset");
+          setNotice("");
+        }
+      }
+    } catch {
+      // 忽略
+    }
   }, []);
+
+  async function submitForgot() {
+    const email = forgotEmail.trim();
+    if (!email) {
+      setNoticeType("error");
+      setNotice("請輸入註冊時的電郵地址");
+      return;
+    }
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      setNoticeType("error");
+      setNotice("請輸入有效的電郵地址");
+      return;
+    }
+    setForgotSubmitting(true);
+    setNoticeType("info");
+    setNotice("正在送出請求，請稍候...");
+    try {
+      const response = await fetch("/api/forgot-password", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const result = await response.json().catch(() => ({ ok: false, message: "系統暫時未能處理請求，請稍後再試。" }));
+      if (result.ok) {
+        setNoticeType("success");
+        setNotice(result.message || "如電郵已註冊，密碼重設連結已寄出，請查收電郵。");
+        setForgotEmail("");
+      } else {
+        setNoticeType("error");
+        setNotice(result.message || "系統暫時未能處理請求，請稍後再試。");
+      }
+    } catch {
+      setNoticeType("error");
+      setNotice("未能連接伺服器，請檢查網絡後再試。");
+    } finally {
+      setForgotSubmitting(false);
+    }
+  }
+
+  async function submitReset() {
+    if (!resetToken) {
+      setNoticeType("error");
+      setNotice("重設連結無效，請重新申請密碼重設。");
+      return;
+    }
+    if (!resetPassword) {
+      setNoticeType("error");
+      setNotice("請輸入新密碼");
+      return;
+    }
+    if (resetPassword.length < 8) {
+      setNoticeType("error");
+      setNotice("新密碼最少需要 8 個字元");
+      return;
+    }
+    if (resetPassword.length > 128) {
+      setNoticeType("error");
+      setNotice("新密碼不可超過 128 個字元");
+      return;
+    }
+    if (resetPassword !== resetConfirmPassword) {
+      setNoticeType("error");
+      setNotice("兩次輸入的密碼不一致，請重新確認");
+      return;
+    }
+    setResetSubmitting(true);
+    setNoticeType("info");
+    setNotice("正在更新密碼，請稍候...");
+    try {
+      const response = await fetch("/api/reset-password", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ token: resetToken, newPassword: resetPassword }),
+      });
+      const result = await response.json().catch(() => ({ ok: false, message: "系統暫時未能處理請求，請稍後再試。" }));
+      if (result.ok) {
+        setNoticeType("success");
+        setNotice("密碼已成功更新，請以新密碼登入。");
+        setResetPassword("");
+        setResetConfirmPassword("");
+        setTimeout(() => {
+          setMode("login");
+          setNotice("");
+          try {
+            const url = new URL(window.location.href);
+            url.searchParams.delete("token");
+            url.hash = "";
+            window.history.replaceState({}, "", url.toString());
+          } catch {
+            // 忽略
+          }
+        }, 2500);
+      } else {
+        setNoticeType("error");
+        setNotice(result.message || "重設連結已失效，請重新申請。");
+      }
+    } catch {
+      setNoticeType("error");
+      setNotice("未能連接伺服器，請檢查網絡後再試。");
+    } finally {
+      setResetSubmitting(false);
+    }
+  }
 
   async function submitDemo(message: string) {
     if (accessCode.trim() !== "01347") {
@@ -615,7 +740,7 @@ function LoginScreen({ onLogin }: { onLogin: (accountName: string) => void }) {
         {/* Card */}
         <div className="auth-card">
           {/* Mode switch tabs */}
-          {mode !== "forgot" && (
+          {(mode === "login" || mode === "register") && (
             <div className="auth-tabs">
               <button
                 className={`auth-tab ${mode === "login" ? "auth-tab-active" : ""}`}
@@ -632,8 +757,8 @@ function LoginScreen({ onLogin }: { onLogin: (accountName: string) => void }) {
             </div>
           )}
 
-          {/* 介紹碼 — always visible except forgot */}
-          {mode !== "forgot" && (
+          {/* 介紹碼 — login/register only */}
+          {(mode === "login" || mode === "register") && (
             <div className="auth-field">
               <label className="auth-label" htmlFor="access-code">介紹碼</label>
               <input
@@ -725,13 +850,69 @@ function LoginScreen({ onLogin }: { onLogin: (accountName: string) => void }) {
           {/* Forgot mode */}
           {mode === "forgot" && (
             <>
+              <div className="auth-field">
+                <label className="auth-label" htmlFor="forgot-email">註冊電郵地址</label>
+                <input
+                  id="forgot-email"
+                  type="email"
+                  className="auth-input"
+                  placeholder="輸入註冊時的電郵地址"
+                  autoComplete="email"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                />
+              </div>
+              <div className="auth-input-hint">輸入註冊電郵後，系統會寄出一次性密碼重設連結（有效期 1 小時）。</div>
+              <button className="auth-btn-primary" onClick={submitForgot} disabled={forgotSubmitting}>
+                {forgotSubmitting ? "正在送出..." : "寄出密碼重設連結"} <ArrowRight className="h-4 w-4" />
+              </button>
+              <button className="auth-btn-text" onClick={() => { setMode("login"); setNotice(""); }}>
+                <ArrowLeft className="h-4 w-4" /> 返回登入
+              </button>
+            </>
+          )}
+
+          {/* Reset mode */}
+          {mode === "reset" && (
+            <>
               <div className="auth-notice auth-notice-info">
                 <CircleHelp className="h-4 w-4 shrink-0 mt-0.5" />
-                <span>本平台暫未提供自動尋回密碼功能。如忘記密碼，請電郵 studybuddytool@hotmail.com，並提供你的帳戶名稱及註冊電郵，管理員核實身份後會為你重設密碼。</span>
+                <span>請設定新密碼。此連結為一次性使用，有效期 1 小時。</span>
               </div>
-              <a className="auth-btn-primary" href="mailto:studybuddytool@hotmail.com?subject=%E5%B0%8B%E5%9B%9E%E5%B8%B3%E6%88%B6%E5%AF%86%E7%A2%BC">
-                電郵管理員重設密碼 <ArrowRight className="h-4 w-4" />
-              </a>
+              <div className="auth-field">
+                <label className="auth-label" htmlFor="reset-password">新密碼</label>
+                <div className="auth-password-wrap">
+                  <input
+                    id="reset-password"
+                    type={showResetPassword ? "text" : "password"}
+                    className="auth-input"
+                    placeholder="輸入新密碼（最少 8 個字元）"
+                    autoComplete="new-password"
+                    value={resetPassword}
+                    onChange={(e) => setResetPassword(e.target.value)}
+                  />
+                  <button type="button" className="auth-password-toggle" onClick={() => setShowResetPassword(!showResetPassword)}>
+                    {showResetPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+              <div className="auth-field">
+                <label className="auth-label" htmlFor="reset-confirm-password">確認新密碼</label>
+                <div className="auth-password-wrap">
+                  <input
+                    id="reset-confirm-password"
+                    type={showResetPassword ? "text" : "password"}
+                    className="auth-input"
+                    placeholder="再次輸入新密碼"
+                    autoComplete="new-password"
+                    value={resetConfirmPassword}
+                    onChange={(e) => setResetConfirmPassword(e.target.value)}
+                  />
+                </div>
+              </div>
+              <button className="auth-btn-primary" onClick={submitReset} disabled={resetSubmitting}>
+                {resetSubmitting ? "正在更新..." : "更新密碼"} <ArrowRight className="h-4 w-4" />
+              </button>
               <button className="auth-btn-text" onClick={() => { setMode("login"); setNotice(""); }}>
                 <ArrowLeft className="h-4 w-4" /> 返回登入
               </button>

@@ -1,7 +1,7 @@
 // 溫習寶 PWA Service Worker
 // 快取 App 外殼，讓網站可安裝、可離線開啟
 
-const CACHE_NAME = 'wenxibao-v4';
+const CACHE_NAME = 'wenxibao-v5';
 const CORE_ASSETS = [
   '/',
   '/index.html',
