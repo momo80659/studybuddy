@@ -978,7 +978,6 @@ function Dashboard({ onNavigate, onStartToday, chapterStats }: { onNavigate: (sc
           <div className="text-[10px] font-semibold tracking-[0.16em] text-[#1A365D]/60">RECOMMENDED PRACTICE</div>
           <h2 className="mt-2 break-words text-[21px] font-bold tracking-[-0.03em] text-[#1A365D]">法例基礎·第1組</h2>
         </div>
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#1A365D]/10 text-[#1A365D] shadow-[inset_2px_2px_5px_rgba(26,54,93,0.08)]"><Play className="h-5 w-5 fill-current" /></div>
       </div>
       <div className="mt-6 grid grid-cols-3 gap-3 border-t border-[#1A365D]/15 pt-4">
         <div><div className="font-mono text-xl font-bold">20</div><div className="mt-1 text-[11px] text-[#1A365D]/60">題目</div></div>
@@ -998,7 +997,7 @@ function Dashboard({ onNavigate, onStartToday, chapterStats }: { onNavigate: (sc
           <div className="font-mono text-[10px] font-semibold tracking-[0.2em] text-[#718096]">YOUR STUDY PATH</div>
           <h2 className="mt-2 text-[24px] font-bold tracking-[-0.04em] text-[#2D3748] sm:text-3xl">四大範疇</h2>
         </div>
-        <button className="flex min-h-11 shrink-0 items-center gap-1 rounded-lg px-2 text-xs font-bold text-[#1A365D] transition hover:bg-[#E8F0F8]" onClick={() => onNavigate("practice")}>查看全部 <ChevronRight className="h-4 w-4" /></button>
+        <button className="flex min-h-11 shrink-0 items-center gap-1 rounded-lg bg-[#1A365D] px-3 text-xs font-bold text-white shadow-[0_4px_10px_rgba(26,54,93,0.22)] transition hover:bg-[#12283F]" onClick={() => onNavigate("practice")}>查看全部 <ChevronRight className="h-4 w-4" /></button>
       </div>
       <div className="space-y-3">
         {chapterStats.map((chapter) => <article key={chapter.id} className="rounded-[18px] border border-[#E1E8F0] bg-white p-4 shadow-[5px_7px_18px_rgba(26,54,93,0.06),-3px_-3px_10px_rgba(255,255,255,0.9)] sm:p-5">
