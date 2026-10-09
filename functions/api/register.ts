@@ -137,6 +137,19 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const { passwordHash, passwordSalt, passwordAlgo } = await hashPassword(password);
 
   try {
+    const existing = await env.DB.prepare(
+      `SELECT account_name, email FROM users WHERE account_name = ? OR email = ? LIMIT 1`,
+    )
+      .bind(accountName, email)
+      .first<{ account_name: string; email: string }>();
+
+    if (existing) {
+      if (existing.account_name === accountName) {
+        return jsonResponse({ ok: false, message: "此帳戶名稱已被使用，請改用其他名稱。" }, 409);
+      }
+      return jsonResponse({ ok: false, message: "此電郵號碼已經註冊。" }, 409);
+    }
+
     await env.DB.prepare(
       `INSERT INTO users (id, account_name, email, password_hash, password_salt, password_algo, created_at, updated_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,

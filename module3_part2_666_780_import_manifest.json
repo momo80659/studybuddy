@@ -1,0 +1,20 @@
+{
+  "source": "../module3_part2_666_780_user_raw.csv",
+  "sourceSha256": "8fa234406a94232a25d46aaf3b56dee016b7b4edd14ab61973858bfd1f4931cd",
+  "backup": "questionBank.ts.backup-before-module3-part2-666-780-20260817T000000",
+  "backupSha256": "3ddb446ec8c58c313e2f025e530844aa68e6b1cac844b662eae9f8803e05d255",
+  "prefixBeforeInsertionSha256": "2f6ca818ad24abf62f8ef6e53f8e27e543219a98bc521cb78e6c52b45fb24577",
+  "importedNumbers": [
+    666,
+    780
+  ],
+  "count": 115,
+  "abbreviationMap": {
+    "警署警長": "SS",
+    "總督察": "CIP",
+    "總警司": "CSP",
+    "警長": "SG",
+    "督察": "IP",
+    "警司": "SP"
+  }
+}

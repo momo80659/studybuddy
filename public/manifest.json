@@ -1,7 +1,7 @@
 {
-  "name": "溫習寶 - 筆試溫習中心",
+  "name": "溫習寶 - 香港警務筆試溫習中心",
   "short_name": "溫習寶",
-  "description": "筆試溫習平台：章節練習、模擬考試、錯題本。",
+  "description": "香港警務 PSQE 筆試溫習平台：章節練習、模擬考試、錯題本。",
   "lang": "zh-Hant",
   "start_url": "/",
   "display": "standalone",

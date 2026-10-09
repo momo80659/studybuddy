@@ -1,0 +1,189 @@
+{
+  "generatedAt": "2026-09-11T09:34:49.356Z",
+  "scope": {
+    "bankPath": "src/data/questionBank.ts",
+    "appPath": "src/App.tsx",
+    "noSourceEditsPerformed": true
+  },
+  "overall": {
+    "passed": true,
+    "checksRun": 14,
+    "checksPassed": 14,
+    "checksFailed": 0,
+    "failedCheckIds": []
+  },
+  "checks": [
+    {
+      "id": "parser.object_extraction",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "extractedObjectCount": 1000,
+        "syntaxIssues": [],
+        "note": "採字串／註解感知的花括號掃描逐題抽取，故舊資料如出現物件之間的多餘逗號不會令整庫驗證中止。"
+      }
+    },
+    {
+      "id": "parser.object_parse",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "parseFailureCount": 0,
+        "parseFailures": []
+      }
+    },
+    {
+      "id": "keys.duplicate",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "duplicateKeyIssueCount": 0,
+        "duplicateKeyIssues": []
+      }
+    },
+    {
+      "id": "bank.count",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "expected": 1000,
+        "actual": 1000
+      }
+    },
+    {
+      "id": "number.continuous_unique",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "expectedRange": "Q1–Q1000",
+        "duplicateNumbers": [],
+        "invalidNumbers": [],
+        "missingNumbers": []
+      }
+    },
+    {
+      "id": "chapter.distribution_report",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "actual": {
+          "law": 380,
+          "command": 150,
+          "ops": 100,
+          "supervision": 370
+        },
+        "totalAcrossChapters": 1000,
+        "invalidChapterRecords": [],
+        "note": "依使用者已確認標準，保留題庫現有 chapter 歸類；本項僅報告實際分布，不以預設配額作失敗判定。"
+      }
+    },
+    {
+      "id": "fields.id_unique",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "duplicateIds": [],
+        "invalidIdCount": 0
+      }
+    },
+    {
+      "id": "fields.required_schema",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "requiredKeys": [
+          "id",
+          "number",
+          "chapter",
+          "type",
+          "stem",
+          "options",
+          "answer",
+          "explanation",
+          "reference"
+        ],
+        "canonicalStemKey": "stem",
+        "missingFieldCount": 0,
+        "missingFields": []
+      }
+    },
+    {
+      "id": "fields.reference_nonempty",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "missingReferenceCount": 0,
+        "missingReferenceNumbers": [],
+        "q316to500": {
+          "expectedCount": 185,
+          "actualCount": 185,
+          "missingReferenceNumbers": [],
+          "passed": true,
+          "note": "包含統一待核實標記在內，reference 只檢查是否存在且非空。"
+        }
+      }
+    },
+    {
+      "id": "options.A_to_D",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "invalidOptionCount": 0,
+        "invalidOptions": []
+      }
+    },
+    {
+      "id": "answer.A_to_D",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "invalidAnswerCount": 0,
+        "invalidAnswers": []
+      }
+    },
+    {
+      "id": "special.q795_answer",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "found": true,
+        "actualAnswer": "C"
+      }
+    },
+    {
+      "id": "special.q891_to_q1000",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "expected": {
+          "count": 110,
+          "idPattern": "module4-part2-{number}",
+          "chapter": "supervision",
+          "type": "Part 2 · 模塊4",
+          "answer": "B"
+        },
+        "actualCount": 110,
+        "issues": []
+      }
+    },
+    {
+      "id": "text.banned_rank_terms",
+      "passed": true,
+      "severity": "error",
+      "details": {
+        "terms": [
+          "警署警長",
+          "總督察",
+          "總警司",
+          "警長",
+          "督察",
+          "警司"
+        ],
+        "hits": {
+          "questionBank": {},
+          "App.tsx": {}
+        }
+      }
+    }
+  ]
+}
