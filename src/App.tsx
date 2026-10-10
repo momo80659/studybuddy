@@ -683,7 +683,7 @@ function LoginScreen({ onLogin }: { onLogin: (accountName: string) => void }) {
     if (mode === "login") {
       if (!loginAccount.trim()) {
         setNoticeType("error");
-        setNotice("請輸入帳戶名稱");
+        setNotice("請輸入帳戶名稱或電郵");
         return;
       }
       if (!loginPassword) {
@@ -778,8 +778,8 @@ function LoginScreen({ onLogin }: { onLogin: (accountName: string) => void }) {
           {mode === "login" && (
             <>
               <div className="auth-field">
-                <label className="auth-label" htmlFor="login-account">賬戶名稱</label>
-                <input id="login-account" className="auth-input" placeholder="例如：HK-EXAM-001" autoComplete="username" value={loginAccount} onChange={(e) => setLoginAccount(e.target.value)} />
+                <label className="auth-label" htmlFor="login-account">帳戶名稱/電郵</label>
+                <input id="login-account" className="auth-input" placeholder="帳戶名稱或電郵，例如：HK-EXAM-001" autoComplete="username" value={loginAccount} onChange={(e) => setLoginAccount(e.target.value)} />
               </div>
               <div className="auth-field">
                 <label className="auth-label" htmlFor="login-password">登入密碼</label>

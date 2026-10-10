@@ -96,16 +96,21 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
   const accessCode = String(body.accessCode || "").trim();
   const accountName = String(body.accountName || "").trim();
+  const email = accountName.toLowerCase();
+  const isEmailLogin = accountName.includes("@");
   const password = String(body.password || "");
 
   if (!timingSafeEqualText(accessCode, REQUIRED_ACCESS_CODE)) {
     return jsonResponse({ ok: false, message: "介紹碼不正確。請輸入有效介紹碼後才可登入。" }, 403);
   }
   if (!accountName) {
-    return jsonResponse({ ok: false, message: "請輸入帳戶名稱。" }, 400);
+    return jsonResponse({ ok: false, message: "請輸入帳戶名稱或電郵。" }, 400);
   }
-  if (accountName.length > 40) {
+  if (!isEmailLogin && accountName.length > 40) {
     return jsonResponse({ ok: false, message: "帳戶名稱不可超過 40 個字元。" }, 400);
+  }
+  if (isEmailLogin && accountName.length > 254) {
+    return jsonResponse({ ok: false, message: "電郵不可超過 254 個字元。" }, 400);
   }
   if (!password) {
     return jsonResponse({ ok: false, message: "請輸入登入密碼。" }, 400);
@@ -115,10 +120,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     const record = await env.DB.prepare(
       `SELECT id, account_name, email, password_hash, password_salt, password_algo
        FROM users
-       WHERE account_name = ?
+       WHERE account_name = ? OR email = ?
        LIMIT 1`,
     )
-      .bind(accountName)
+      .bind(accountName, email)
       .first<{
         id: string;
         account_name: string;
@@ -129,7 +134,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       }>();
 
     if (!record) {
-      return jsonResponse({ ok: false, message: "帳戶名稱或密碼不正確。" }, 401);
+      return jsonResponse({ ok: false, message: "帳戶名稱、電郵或密碼不正確。" }, 401);
     }
 
     if (record.password_algo !== SUPPORTED_ALGO) {
@@ -140,7 +145,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     const derivedHash = await derivePasswordHash(password, salt);
 
     if (!timingSafeEqualText(derivedHash, record.password_hash)) {
-      return jsonResponse({ ok: false, message: "帳戶名稱或密碼不正確。" }, 401);
+      return jsonResponse({ ok: false, message: "帳戶名稱、電郵或密碼不正確。" }, 401);
     }
 
     return jsonResponse({
